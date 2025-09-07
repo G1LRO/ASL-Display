@@ -7,8 +7,8 @@ This repository contains a Python script (`display_driver.py`) that enables a Ra
 ## Features
 - **Real-Time Display**: Shows local IP address, system uptime, connected AllStarLink nodes (up to 3), and a favorites menu for quick connections (up to 6 nodes).
 - **Button Controls**:
-  - Button A: Cycles through selections (e.g., favorites or nodes).
-  - Button B: Connects/disconnects nodes, switches to favorites mode, or exits.
+  - Button A: **Move** Cycles through selections (e.g., favorites or nodes).
+  - Button B: **Do** Connects/disconnects nodes, switches to favorites mode, or exits.
 - **Automatic Updates**: Display refreshes every 1 second; node status updates every 5 seconds.
 - **Favorites Support**: Load node names and numbers from a simple text file (`favourites.txt`).
 - **Error Handling**: Graceful handling for display, font, favorites file, and Asterisk commands.
