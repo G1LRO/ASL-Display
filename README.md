@@ -1,6 +1,6 @@
 # ASL-Display: AllStarLink Display Driver
 
-![Display Example](https://placehold.co/240x240/png?text=Display+Example) <!-- Replace with an actual screenshot of the display in action -->
+![Display Example](https://raw.githubusercontent.com/G1LRO/ASL-Display/refs/heads/main/RLN-Z2.jpg) <!-- Replace with an actual screenshot of the display in action -->
 
 This repository contains a Python script (`display_driver.py`) that enables a Raspberry Pi with an Adafruit Mini PiTFT (ST7789 display) to serve as a controller for AllStarLink nodes. It shows system IP, uptime, connected nodes, and favorites, with button-based navigation for connecting/disconnecting nodes. The accompanying install script (`installdisplay.sh`) automates the setup process, including dependency installation, virtual environment creation, and systemd service configuration for automatic startup on boot.
 
