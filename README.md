@@ -17,7 +17,8 @@ This repository contains a Python script (`display_driver.py`) that enables a Ra
 ## Hardware Requirements
 - Raspberry Pi (tested on Raspberry Pi OS, Debian-based).
 - Adafruit Mini PiTFT or equivalent ST7789-based 240x240 display.
-  - Wiring:
+- Also available from [AliExpress](https://www.aliexpress.com/item/1005001746881831.html)
+- Wiring (expected standard on this model):
     - CS: GPIO CE0 (pin 24)
     - DC: GPIO D25 (pin 22)
     - Backlight: GPIO D22 (pin 15)
