@@ -1,5 +1,6 @@
 #!/bin/bash
 
+# Version at https://github.com/G1LRO/ASL-Display
 # This script installs and sets up the display_driver.py for AllStarLink3 on Raspberry Pi.
 # Run as admin user: bash install_display_driver_script.sh
 # Assumptions: Raspberry Pi OS (Debian-based), AllStarLink installed with Asterisk.
