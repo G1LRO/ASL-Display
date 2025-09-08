@@ -4,6 +4,9 @@
 
 This repository contains a Python script (`display_driver.py`) that enables a Raspberry Pi with an Adafruit Mini PiTFT (ST7789 display) to serve as a controller for AllStarLink nodes. It shows system IP, uptime, connected nodes, and favorites, with button-based navigation for connecting/disconnecting nodes. The accompanying install script (`installdisplay.sh`) automates the setup process, including dependency installation, virtual environment creation, and systemd service configuration for automatic startup on boot.
 
+## NEW: Simple install instructions on my website https://g1lro.uk/?p=848
+
+
 ## Features
 - **Real-Time Display**: Shows local IP address, system uptime, connected AllStarLink nodes (up to 3), and a favorites menu for quick connections (up to 6 nodes).
 - **Button Controls**:
