@@ -1,4 +1,5 @@
 #!/home/admin/myenv/bin/python
+# Version at https://github.com/G1LRO/ASL-Display
 # SPDX-FileCopyrightText: 2021 ladyada for Adafruit Industries
 # SPDX-FileCopyrightText: 2025 GU1LRO
 # SPDX-License-Identifier: MIT
