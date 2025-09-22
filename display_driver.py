@@ -84,25 +84,45 @@ backlight = digitalio.DigitalInOut(board.D22)
 backlight.switch_to_output()
 backlight.value = True
 
-# AllStarLink node number
-node_number = "58175"
-
-# Read favorites from file
-def read_favorites():
+# Read node number and favorites from file
+def read_config():
     favorites_file = os.path.expanduser("~/favourites.txt")
     try:
         with open(favorites_file, "r") as f:
-            lines = f.readlines()[:6]  # Up to 6 favorites
+            lines = f.readlines()
+        
+        # First line should be the node number
+        if not lines:
+            print("Error: favourites.txt is empty")
+            return None, {}
+        
+        node_number_line = lines[0].strip()
+        if not node_number_line or not node_number_line.isdigit():
+            print(f"Error: First line '{node_number_line}' is not a valid node number")
+            return None, {}
+        
+        node_number = node_number_line
+        print(f"Using node number: {node_number}")
+        
+        # Read favorites from remaining lines
         favorites = {}
-        for line in lines:
+        for line in lines[1:7]:  # Lines 2-7 (up to 6 favorites)
             parts = line.strip().split(",")
             if len(parts) == 2 and parts[1].isdigit():
                 favorites[parts[1]] = parts[0]
-        print(f"Loaded favorites: {favorites}")  # Debug
-        return favorites
+        
+        print(f"Loaded favorites: {favorites}")
+        return node_number, favorites
+        
     except Exception as e:
-        print(f"Favorites file error: {e}")
-        return {}
+        print(f"Config file error: {e}")
+        return None, {}
+
+# Get configuration at startup
+node_number, favorites = read_config()
+if node_number is None:
+    print("Failed to read node number from favourites.txt")
+    exit(1)
 
 # Handle button presses with edge detection
 def handle_buttons(display_mode, selection_index, connected_nodes, favorites_list):
@@ -174,7 +194,6 @@ def handle_buttons(display_mode, selection_index, connected_nodes, favorites_lis
 # Initialize state
 display_mode = "main"
 selection_index = 0
-favorites = read_favorites()
 last_button_a_time = 0
 last_button_b_time = 0
 last_button_a_state = False

@@ -193,6 +193,8 @@ fi
 if [ ! -f "$FAV_FILE" ]; then
     echo "Step 14: Creating sample favourites.txt..."
     cat > "$FAV_FILE" << EOF
+99999
+#^^^ Your node number here
 # AllStarLink Favourites - Format: Name,NodeNumber
 # Up to 6 favourites supported
 Hubnet,41223
