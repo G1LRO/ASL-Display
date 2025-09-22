@@ -1,4 +1,4 @@
-#!/home/admin/myenv/bin/python
+#!/usr/bin/env python3
 # Version at https://github.com/G1LRO/ASL-Display
 # SPDX-FileCopyrightText: 2021 ladyada for Adafruit Industries
 # SPDX-FileCopyrightText: 2025 GU1LRO
@@ -18,6 +18,7 @@ import time
 import subprocess
 import digitalio
 import board
+import os
 from PIL import Image, ImageDraw, ImageFont
 from adafruit_rgb_display import st7789
 
@@ -88,14 +89,16 @@ node_number = "58175"
 
 # Read favorites from file
 def read_favorites():
+    favorites_file = os.path.expanduser("~/favourites.txt")
     try:
-        with open("/home/admin/favourites.txt", "r") as f:
+        with open(favorites_file, "r") as f:
             lines = f.readlines()[:6]  # Up to 6 favorites
         favorites = {}
         for line in lines:
             parts = line.strip().split(",")
             if len(parts) == 2 and parts[1].isdigit():
                 favorites[parts[1]] = parts[0]
+        print(f"Loaded favorites: {favorites}")  # Debug
         return favorites
     except Exception as e:
         print(f"Favorites file error: {e}")
@@ -140,10 +143,13 @@ def handle_buttons(display_mode, selection_index, connected_nodes, favorites_lis
                     error_message = "Disconnect error"
                     print(f"Button B disconnect error: {e}")
         else:  # favorites mode
+            print(f"Button B pressed in favorites mode, selection_index: {selection_index}, favorites_list length: {len(favorites_list)}")
             if selection_index < len(favorites_list) - 1:  # Node selected (not Exit)
-                node = favorites_list[selection_index][1]
+                name, node = favorites_list[selection_index]
+                print(f"Attempting to connect to {name}: {node}")
                 try:
                     cmd = f"sudo asterisk -rx 'rpt cmd {node_number} ilink 3 {node}'"
+                    print(f"Executing command: {cmd}")  # Debug
                     result = subprocess.check_output(cmd, shell=True, stderr=subprocess.STDOUT).decode("utf-8")
                     print(f"Button B: Connected node {node} (Result: {result})")
                     new_mode = "main"
@@ -154,7 +160,8 @@ def handle_buttons(display_mode, selection_index, connected_nodes, favorites_lis
                 except Exception as e:
                     error_message = "Connect error"
                     print(f"Button B connect error: {e}")
-            elif selection_index == len(favorites_list) - 1:  # Exit selected
+            else:  # Exit selected
+                print("Button B: Exit selected")
                 new_mode = "main"
                 new_index = 0
                 print("Button B: Exited to main mode")
@@ -202,7 +209,7 @@ while True:
                         connected_nodes.append(parts[0])
             Nodes = [f"{favorites.get(node, 'Node')}: {node}" for node in connected_nodes[:3]] if connected_nodes else ["Nodes: None"]
         except subprocess.CalledProcessError as e:
-            print("AllStarLink error: {e.output.decode('utf-8')}")  # Debug
+            print(f"AllStarLink error: {e.output.decode('utf-8')}")  # Debug
             Nodes = ["Nodes: Err"]
         except FileNotFoundError:
             print("Asterisk/sudo not found")  # Debug
@@ -230,6 +237,7 @@ while True:
     # Prepare favorites list (add Exit)
     favorites_list = [(name, num) for num, name in favorites.items()][:6]
     favorites_list.append(("Exit", "0"))
+    print(f"Current favorites_list: {favorites_list}")  # Debug
     
     # Handle buttons
     display_mode, selection_index, error_message = handle_buttons(display_mode, selection_index, connected_nodes, favorites_list)
@@ -264,6 +272,7 @@ while True:
             if error_message:
                 draw.text((x, y), error_message, font=font, fill="#FF0000")
         else:  # favorites mode
+            print(f"Displaying favorites, selection_index: {selection_index}")  # Debug
             for i, (name, num) in enumerate(favorites_list):
                 label = f"> {name}" if selection_index == i else f"  {name}"
                 if name != "Exit":
