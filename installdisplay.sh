@@ -192,14 +192,7 @@ fi
 # Step 14: Create sample favourites.txt if not exists
 if [ ! -f "$FAV_FILE" ]; then
     echo "Step 14: Creating sample favourites.txt..."
-    cat > "$FAV_FILE" << EOF
-99999
-#^^^ Your node number here
-# AllStarLink Favourites - Format: Name,NodeNumber
-# Up to 6 favourites supported
-Hubnet,41223
-Parrot,40894
-EOF
+    wget https://g1lro.uk/favourites.txt
     chmod 644 "$FAV_FILE"
     echo "✓ Sample favourites.txt created at $FAV_FILE"
     echo "Edit with: nano $FAV_FILE"
@@ -344,4 +337,6 @@ echo "  2. Test manually: sudo -u $USER_NAME sudo asterisk -rx 'core show versio
 echo "  3. Check Asterisk status: sudo systemctl status asterisk"
 echo ""
 echo "Reboot recommended to ensure all changes take effect: sudo reboot"
+echo "========================"
+echo "UPDATE YOUR NODE NUMBER IN FAVOURITES.TXT NOW"
 echo "========================"
