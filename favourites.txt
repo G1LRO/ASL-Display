@@ -1,0 +1,6 @@
+99999
+# ^^ Your node number here
+# AllStarLink Favourites - Format: Name,NodeNumber
+# Up to 6 favourites supported
+Hubnet,41223
+Parrot,40894
