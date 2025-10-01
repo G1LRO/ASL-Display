@@ -104,16 +104,19 @@ def read_config():
         node_number = node_number_line
         print(f"Using node number: {node_number}")
         
-        # Read favorites from remaining lines
+        # Read favorites from remaining lines, up to 6 valid entries
         favorites = {}
-        for line in lines[1:7]:  # Lines 2-7 (up to 6 favorites)
+        favorite_count = 0
+        for line in lines[1:]:  # Process all lines after the first
+            if favorite_count >= 6:  # Stop after 6 favorites
+                break
             parts = line.strip().split(",")
             if len(parts) == 2 and parts[1].isdigit():
                 favorites[parts[1]] = parts[0]
+                favorite_count += 1
         
         print(f"Loaded favorites: {favorites}")
         return node_number, favorites
-        
     except Exception as e:
         print(f"Config file error: {e}")
         return None, {}
