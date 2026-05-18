@@ -416,7 +416,7 @@ shutdown_hold_duration = 2.0
 
 # ===== STARTUP SPLASH (synchronous — display thread not yet running) =====
 draw.rectangle((0, 0, width, height), outline=0, fill=(0, 0, 0))
-draw.text((x, top + 20),  f"RLNZ2 v{VERSION}",  font=font, fill="#FFFFFF")
+draw.text((x, top + 20),  f"ASL3 v{VERSION}",   font=font, fill="#FFFFFF")
 draw.text((x, top + 60),  "Display Driver",      font=font, fill="#FFFFFF")
 draw.text((x, top + 110), "Copyright 2026",      font=font, fill="#FFFFFF")
 draw.text((x, top + 160), "G1LRO.UK",            font=font, fill="#FFFFFF")
