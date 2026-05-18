@@ -31,8 +31,6 @@ IP address and uptime are now read using native Python (`socket`, `/proc/uptime`
 - **Node name lookup** — connected nodes are looked up in `astdb.txt` for their callsign, falling back to favourites labels or "Node".
 - **Total linked node count** — displayed at the bottom of the main screen.
 - **Safe shutdown** — hold both buttons for 2 seconds to initiate a clean `shutdown -h now` with an on-screen message.
-- **Startup splash** — shows `ASL3 v1.75 / Display Driver / Copyright 2026 / G1LRO.UK` for 1 second at boot.
-- **VERSION constant** — single place at the top of the file to update the version number.
 
 ---
 
