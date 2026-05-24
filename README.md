@@ -65,6 +65,8 @@ IP address and uptime are now read using native Python (`socket`, `/proc/uptime`
 ## Installation
 1. **Clone the repository**:
    ```
+   sudo apt update
+   sudo apt install git
    git clone https://github.com/G1LRO/ASL-Display.git
    cd ASL-Display
    ```
