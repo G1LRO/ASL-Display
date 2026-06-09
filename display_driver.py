@@ -194,7 +194,7 @@ if node_number is None:
 
 _state_lock = threading.Lock()
 _display_event = threading.Event()
-_shutdown_rendered = threading.Event()
+_render_lock = threading.Lock()
 _display_state = {
     "mode": "main",
     "selection_index": 0,
@@ -210,60 +210,61 @@ _display_state = {
 
 
 def _render():
-    """Read shared state, draw to PIL image, push to SPI. Called only from display thread."""
-    with _state_lock:
-        s = dict(_display_state)
+    """Read shared state, draw to PIL image, push to SPI."""
+    with _render_lock:
+        with _state_lock:
+            s = dict(_display_state)
 
-    draw.rectangle((0, 0, width, height), outline=0, fill=(0, 0, 0))
-    y = top
+        draw.rectangle((0, 0, width, height), outline=0, fill=(0, 0, 0))
+        y = top
 
-    if s["mode"] == "shutdown":
-        draw.text((x, y + 60), "SHUTTING DOWN", font=font, fill="#FF0000")
-        y2 = y + 60 + font.getbbox("SHUTTING DOWN")[3] - font.getbbox("SHUTTING DOWN")[1] + 12
-        draw.text((x, y2), "Safe to power off", font=font, fill="#FFFF00")
-        y2 += font.getbbox("Safe to power off")[3] - font.getbbox("Safe to power off")[1] + 12
-        draw.text((x, y2), "in 15 seconds", font=font, fill="#FFFF00")
+        if s["mode"] == "shutdown":
+            draw.text((x, y + 60), "SHUTTING DOWN", font=font, fill="#FF0000")
+            y2 = y + 60 + font.getbbox("SHUTTING DOWN")[3] - font.getbbox("SHUTTING DOWN")[1] + 12
+            draw.text((x, y2), "Safe to power off", font=font, fill="#FFFF00")
+            y2 += font.getbbox("Safe to power off")[3] - font.getbbox("Safe to power off")[1] + 12
+            draw.text((x, y2), "in 15 seconds", font=font, fill="#FFFF00")
 
-    elif s["mode"] == "main":
-        draw.text((x, y), s["IP"], font=font, fill="#FFFFFF")
-        y += font.getbbox(s["IP"])[3] - font.getbbox(s["IP"])[1] + 12
+        elif s["mode"] == "main":
+            draw.text((x, y), s["IP"], font=font, fill="#FFFFFF")
+            y += font.getbbox(s["IP"])[3] - font.getbbox(s["IP"])[1] + 12
 
-        draw.text((x, y), s["Uptime"], font=font, fill="#0000FF")
-        y += font.getbbox(s["Uptime"])[3] - font.getbbox(s["Uptime"])[1] + 12
+            draw.text((x, y), s["Uptime"], font=font, fill="#0000FF")
+            y += font.getbbox(s["Uptime"])[3] - font.getbbox(s["Uptime"])[1] + 12
 
-        lbl = "> Favourites" if s["selection_index"] == 0 else "  Favourites"
-        draw.text((x, y), lbl, font=font, fill="#FFFF00")
-        y += font.getbbox(lbl)[3] - font.getbbox(lbl)[1] + 12
-
-        for i, node in enumerate(s["Nodes"]):
-            lbl = f"> {node}" if s["selection_index"] == i + 1 else f"  {node}"
-            draw.text((x, y), lbl, font=font, fill="#00FF00")
-            y += font.getbbox(node)[3] - font.getbbox(node)[1] + 12
-
-        if s["linked_nodes_count"] > 0:
-            draw.text((x, height - 28), f"{s['linked_nodes_count']} nodes linked",
-                      font=font, fill="#00FF00")
-
-        msg = s["status_message"] or s["error_message"]
-        if msg:
-            draw.text((x, y), msg, font=font,
-                      fill="#FF8800" if s["status_message"] else "#FF0000")
-
-    else:  # favorites
-        for i, (name, num) in enumerate(s["favorites_list"]):
-            lbl = f"> {name}" if s["selection_index"] == i else f"  {name}"
-            if name != "Exit":
-                lbl += f": {num}"
-            draw.text((x, y), lbl, font=font,
-                      fill="#FFFF00" if name == "Exit" else "#00FF00")
+            lbl = "> Favourites" if s["selection_index"] == 0 else "  Favourites"
+            draw.text((x, y), lbl, font=font, fill="#FFFF00")
             y += font.getbbox(lbl)[3] - font.getbbox(lbl)[1] + 12
 
-        msg = s["status_message"] or s["error_message"]
-        if msg:
-            draw.text((x, y), msg, font=font,
-                      fill="#FF8800" if s["status_message"] else "#FF0000")
+            for i, node in enumerate(s["Nodes"]):
+                lbl = f"> {node}" if s["selection_index"] == i + 1 else f"  {node}"
+                draw.text((x, y), lbl, font=font, fill="#00FF00")
+                y += font.getbbox(node)[3] - font.getbbox(node)[1] + 12
 
-    disp.image(image, rotation)
+            if s["linked_nodes_count"] > 0:
+                draw.text((x, height - 28), f"{s['linked_nodes_count']} nodes linked",
+                          font=font, fill="#00FF00")
+
+            msg = s["status_message"] or s["error_message"]
+            if msg:
+                draw.text((x, y), msg, font=font,
+                          fill="#FF8800" if s["status_message"] else "#FF0000")
+
+        else:  # favorites
+            for i, (name, num) in enumerate(s["favorites_list"]):
+                lbl = f"> {name}" if s["selection_index"] == i else f"  {name}"
+                if name != "Exit":
+                    lbl += f": {num}"
+                draw.text((x, y), lbl, font=font,
+                          fill="#FFFF00" if name == "Exit" else "#00FF00")
+                y += font.getbbox(lbl)[3] - font.getbbox(lbl)[1] + 12
+
+            msg = s["status_message"] or s["error_message"]
+            if msg:
+                draw.text((x, y), msg, font=font,
+                          fill="#FF8800" if s["status_message"] else "#FF0000")
+
+        disp.image(image, rotation)
 
 
 def _display_worker():
@@ -272,9 +273,6 @@ def _display_worker():
         _display_event.clear()
         try:
             _render()
-            with _state_lock:
-                if _display_state["mode"] == "shutdown":
-                    _shutdown_rendered.set()
         except Exception as e:
             print(f"Display error: {e}")
 
@@ -387,9 +385,9 @@ def check_shutdown():
             shutdown_pressed = True
             shutdown_start_time = time.time()
         elif time.time() - shutdown_start_time >= shutdown_hold_duration:
-            _shutdown_rendered.clear()
-            mark_dirty(mode="shutdown")
-            _shutdown_rendered.wait(timeout=2.0)  # wait until frame is on screen
+            with _state_lock:
+                _display_state["mode"] = "shutdown"
+            _render()  # renders directly in main thread; _render_lock blocks display thread
             print("Shutdown initiated by button press")
             subprocess.run("sudo shutdown -h now", shell=True)
             time.sleep(15)
