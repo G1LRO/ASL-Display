@@ -65,7 +65,8 @@ fi
 
 # Step 2: Update and upgrade system
 echo "Step 2: Updating system..."
-sudo apt update && sudo apt upgrade -y
+sudo apt update
+#&& sudo apt upgrade -y
 
 # Step 3: Install required packages
 echo "Step 3: Installing Python, build tools, and dependencies..."
