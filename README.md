@@ -131,7 +131,7 @@ journalctl -u display_driver.service -b
 
 ## Credits
 - Inspired by Adafruit's RGB display examples.
-- Developed by GU1LRO for non-commercial ham radio use.
+- Developed by G1LRO for non-commercial ham radio use.
 - Website: [g1lro.uk](https://g1lro.uk)
 
 Contributions welcome — open an issue or submit a pull request.

@@ -3,7 +3,7 @@
 # This script installs and sets up the display driver for AllStarLink3 on Raspberry Pi.
 # Run as any user: bash install_display_driver_script.sh
 # Assumptions: Raspberry Pi OS (Debian-based), AllStarLink installed with Asterisk.
-# Downloads display_driver.py from https://g1lro.uk/display_driver.py automatically.
+# Downloads display_driver.py from GitHub automatically.
 
 set -e  # Exit on error
 
@@ -108,7 +108,7 @@ fi
 echo "Step 7: Checking Asterisk installation..."
 if command -v asterisk >/dev/null 2>&1; then
     echo "✓ Asterisk is installed."
-    echo "Asterisk version: $(asterisk -rx "core show version" 2>/dev/null | head -1 || echo "Unknown")"
+    echo "Asterisk version: $(sudo asterisk -rx "core show version" 2>/dev/null | head -1 || echo "Unknown")"
 else
     echo "Error: Asterisk not found. Please ensure AllStarLink is installed."
     exit 1
@@ -155,7 +155,7 @@ pip install adafruit-circuitpython-rgb-display pillow
 # Step 12: Test Asterisk connectivity from virtual environment
 echo "Step 12: Testing Asterisk connectivity..."
 TEST_AST_RESULT=""
-if sudo -u "$USER_NAME" "$VENV_PATH"/bin/python -c "
+if "$VENV_PATH"/bin/python -c "
 import subprocess
 try:
     result = subprocess.check_output('sudo asterisk -rx \"rpt lstats 58175\"', shell=True, stderr=subprocess.STDOUT).decode('utf-8')
@@ -174,7 +174,7 @@ deactivate
 # Step 13: Test run the script
 echo "Step 13: Testing $SCRIPT_NAME..."
 TEST_PID=""
-if sudo -u "$USER_NAME" "$VENV_PATH"/bin/python "$SCRIPT_PATH" >/tmp/display_driver_test.log 2>&1 & then
+if "$VENV_PATH"/bin/python "$SCRIPT_PATH" >/tmp/display_driver_test.log 2>&1 & then
     TEST_PID=$!
     echo "✓ Test run started successfully (PID: $TEST_PID). Check the display for 10 seconds..."
     sleep 10
@@ -192,7 +192,7 @@ fi
 # Step 14: Create sample favourites.txt if not exists
 if [ ! -f "$FAV_FILE" ]; then
     echo "Step 14: Creating sample favourites.txt..."
-    wget https://g1lro.uk/favourites.txt
+    wget -O "$FAV_FILE" https://raw.githubusercontent.com/G1LRO/ASL-Display/refs/heads/main/favourites.txt
     chmod 644 "$FAV_FILE"
     echo "✓ Sample favourites.txt created at $FAV_FILE"
     echo "Edit with: nano $FAV_FILE"
@@ -246,7 +246,7 @@ if sudo systemctl is-active --quiet display_driver.service; then
     sleep 3  # Wait for script to initialize
     
     # Test asterisk command through service context
-    if sudo -u "$USER_NAME" "$VENV_PATH"/bin/python -c "
+    if "$VENV_PATH"/bin/python -c "
 import subprocess
 import time
 time.sleep(2)  # Wait for script to fully start
