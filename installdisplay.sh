@@ -18,7 +18,7 @@ SCRIPT_PATH="$USER_HOME/$SCRIPT_NAME"
 FAV_FILE="$USER_HOME/favourites.txt"
 SERVICE_FILE="/etc/systemd/system/display_driver.service"
 FONT_PATH="/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"
-DOWNLOAD_URL="https://g1lro.uk/display_driver.py"
+DOWNLOAD_URL="https://raw.githubusercontent.com/G1LRO/ASL-Display/refs/heads/main/display_driver.py"
 
 # Display detected paths
 echo "=== Display Driver Installation for User: $USER_NAME ==="
