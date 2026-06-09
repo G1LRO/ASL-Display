@@ -194,6 +194,7 @@ if node_number is None:
 
 _state_lock = threading.Lock()
 _display_event = threading.Event()
+_shutdown_rendered = threading.Event()
 _display_state = {
     "mode": "main",
     "selection_index": 0,
@@ -271,6 +272,9 @@ def _display_worker():
         _display_event.clear()
         try:
             _render()
+            with _state_lock:
+                if _display_state["mode"] == "shutdown":
+                    _shutdown_rendered.set()
         except Exception as e:
             print(f"Display error: {e}")
 
@@ -383,8 +387,9 @@ def check_shutdown():
             shutdown_pressed = True
             shutdown_start_time = time.time()
         elif time.time() - shutdown_start_time >= shutdown_hold_duration:
+            _shutdown_rendered.clear()
             mark_dirty(mode="shutdown")
-            time.sleep(0.5)  # Let display thread render before shutdown call
+            _shutdown_rendered.wait(timeout=2.0)  # wait until frame is on screen
             print("Shutdown initiated by button press")
             subprocess.run("sudo shutdown -h now", shell=True)
             time.sleep(15)
