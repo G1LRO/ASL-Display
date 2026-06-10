@@ -190,17 +190,28 @@ else
     echo "You may need to check hardware connections or node number configuration."
 fi
 
-# Step 14: Create sample favourites.txt if not exists
+# Step 14: Create sample favourites.txt if not exists, and set the node number
 if [ ! -f "$FAV_FILE" ]; then
     echo "Step 14: Creating sample favourites.txt..."
     wget -O "$FAV_FILE" https://raw.githubusercontent.com/G1LRO/ASL-Display/refs/heads/main/favourites.txt
     chmod 644 "$FAV_FILE"
     echo "✓ Sample favourites.txt created at $FAV_FILE"
-    echo "Edit with: nano $FAV_FILE"
 else
     echo "Step 14: $FAV_FILE already exists, skipping creation."
     chmod 644 "$FAV_FILE"
 fi
+
+# Auto-detect this node's number from the simpleusb.conf node stanza, e.g. [58175](node-main)
+DETECTED_NODE=$(grep -oP '^\[\K[0-9]+(?=\]\s*\(node-main\))' /etc/asterisk/simpleusb.conf 2>/dev/null | head -1)
+
+if [ -n "$DETECTED_NODE" ]; then
+    sed -i "1s/.*/$DETECTED_NODE/" "$FAV_FILE"
+    echo "✓ Node number auto-detected from simpleusb.conf and set to $DETECTED_NODE in $FAV_FILE"
+else
+    echo "⚠ Could not auto-detect node number from /etc/asterisk/simpleusb.conf"
+    echo "  Edit line 1 of $FAV_FILE with your node number manually."
+fi
+echo "Edit favourites with: nano $FAV_FILE"
 
 # Step 15: Set up systemd service to run the script on boot
 echo "Step 15: Setting up systemd service..."
@@ -338,6 +349,8 @@ echo "  2. Test manually: sudo -u $USER_NAME sudo asterisk -rx 'core show versio
 echo "  3. Check Asterisk status: sudo systemctl status asterisk"
 echo ""
 echo "Reboot recommended to ensure all changes take effect: sudo reboot"
-echo "========================"
-echo "UPDATE YOUR NODE NUMBER IN FAVOURITES.TXT NOW"
-echo "========================"
+if [ -z "$DETECTED_NODE" ]; then
+    echo "========================"
+    echo "UPDATE YOUR NODE NUMBER IN FAVOURITES.TXT NOW"
+    echo "========================"
+fi
